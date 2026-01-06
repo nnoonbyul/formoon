@@ -72,6 +72,12 @@
       font-weight:800;
     }
 
+    .btn-active{
+      border-color: rgba(124,58,237,0.55) !important;
+      color: var(--accent) !important;
+      background: rgba(124,58,237,0.06) !important;
+    }
+
     .board{
       background:var(--card);
       border:1px solid var(--line);
@@ -297,7 +303,7 @@
       gap:10px;
     }
 
-    /* ✅ click-to-reveal actions */
+    /* click-to-reveal actions */
     .tx{
       position:relative;
       border:1px solid var(--line);
@@ -445,17 +451,21 @@
       background:#fff;
     }
 
-    /* ✅ legend: gray border (no purple) */
+    /* legend: smaller + one line scroll on mobile */
     .legend{
       margin-top:10px;
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+      gap:8px;
+      flex-wrap:nowrap;
+      overflow-x:auto;
       color:var(--muted);
       font-size:12px;
       font-weight:900;
       user-select:none;
+      -webkit-overflow-scrolling:touch;
     }
+    .legend::-webkit-scrollbar{ height:6px; }
+    .legend::-webkit-scrollbar-thumb{ background:rgba(107,114,128,0.25); border-radius:999px; }
     .legend .leg{
       display:inline-flex;
       align-items:center;
@@ -465,11 +475,11 @@
       border-radius:999px;
       background:#fff;
       cursor:default;
-      font-size:11px;           /* 줄임 */
+      font-size:11px;
       white-space:nowrap;
+      flex:0 0 auto;
     }
     .legend .leg .dot{ width:9px; height:9px; }
-    .legend{ gap:8px; }
 
     /* Annual */
     .annual{
@@ -690,7 +700,6 @@
         <div class="chart-wrap">
           <div class="cat-totals" id="monthCatTotals"></div>
           <canvas id="chart"></canvas>
-
           <div class="legend" id="legend"></div>
         </div>
       </section>
@@ -798,17 +807,19 @@
     const catLabel = Object.fromEntries(CATS.map(c => [c.key, c.label]));
     const catColor = Object.fromEntries(CATS.map(c => [c.key, c.color]));
 
+    /* =========================
+       Canvas color resolver
+       (so canvas can use CSS variables)
+    ========================= */
     function resolveCssColor(value){
-  // "var(--sub)" 같은 문자열을 실제 색(#ef4444)으로 바꿔줌
-  if (!value) return "rgba(107,114,128,0.6)";
-  const s = String(value).trim();
-  if (!s.startsWith("var(")) return s;
+      if (!value) return "rgba(107,114,128,0.6)";
+      const s = String(value).trim();
+      if (!s.startsWith("var(")) return s;
 
-  const name = s.slice(4, -1).trim(); // --sub
-  const real = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return real || "rgba(107,114,128,0.6)";
-}
-
+      const name = s.slice(4, -1).trim();
+      const real = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return real || "rgba(107,114,128,0.6)";
+    }
 
     /* =========================
        Storage
@@ -931,8 +942,6 @@
     const vRemain = document.getElementById("vRemain");
     const vNextBudget = document.getElementById("vNextBudget");
     const progressBar = document.getElementById("progressBar");
-    const progressLeft = document.getElementById("progressLeft");
-    const progressRight = document.getElementById("progressRight");
 
     const selectedDateTitle = document.getElementById("selectedDateTitle");
     const dayItemsEl = document.getElementById("dayItems");
@@ -1029,13 +1038,14 @@
         dayDots(key).forEach(cat => {
           const dot = document.createElement("span");
           dot.className = "dot";
-          dot.style.background = catColor[cat] || "rgba(107,114,128,0.6)";
+          dot.style.background = resolveCssColor(catColor[cat]) || "rgba(107,114,128,0.6)";
           dots.appendChild(dot);
         });
         cell.appendChild(dots);
 
         cell.onclick = () => {
           selectedKey = key;
+          openCardId = null;
           renderSelectedDate();
           renderCalendar();
         };
@@ -1047,11 +1057,6 @@
     /* =========================
        Box2 (오늘의 소비)
     ========================= */
-    function closeOpenCard(){
-      openCardId = null;
-      renderSelectedDate();
-    }
-
     function renderSelectedDate(){
       const d = parseDateKey(selectedKey);
       selectedDateTitle.textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
@@ -1103,7 +1108,7 @@
 
         const dot = document.createElement("span");
         dot.className = "dot";
-        dot.style.background = catColor[it.category] || "rgba(107,114,128,0.6)";
+        dot.style.background = resolveCssColor(catColor[it.category]) || "rgba(107,114,128,0.6)";
 
         pill.appendChild(dot);
         pill.appendChild(document.createTextNode(catLabel[it.category] || it.category));
@@ -1184,8 +1189,12 @@
       const pctClamped = clamp(pct, 0, 1);
 
       progressBar.style.width = `${pctClamped * 100}%`;
-      document.getElementById("progressLeft").textContent = `${Math.round(pctClamped * 100)}%`;
-      document.getElementById("progressRight").textContent = `${money(info.spent)} / ${money(info.budget)}`;
+
+      const progressLeft = document.getElementById("progressLeft");
+      const progressRight = document.getElementById("progressRight");
+
+      progressLeft.textContent = `${Math.round(pctClamped * 100)}%`;
+      progressRight.textContent = `${money(info.spent)} / ${money(info.budget)}`;
 
       if (pct > 1){
         progressBar.style.background = "rgba(239,68,68,0.55)";
@@ -1219,7 +1228,7 @@
 
         const dot = document.createElement("span");
         dot.className = "dot";
-        dot.style.background = c.color;
+        dot.style.background = resolveCssColor(c.color);
 
         pill.appendChild(dot);
         pill.appendChild(document.createTextNode(c.label));
@@ -1310,7 +1319,6 @@
         const vh = (v / maxV) * plotH;
         const y = padT + (plotH - vh);
 
-        /* ✅ use category color */
         ctx.fillStyle = resolveCssColor(c.color);
         ctx.fillRect(x, y, barW, vh);
 
@@ -1329,7 +1337,7 @@
     function renderLegend(){
       legendEl.innerHTML = CATS.map(c => `
         <div class="leg">
-          <span class="dot" style="background:${c.color}"></span>${c.label}
+          <span class="dot" style="background:${resolveCssColor(c.color)}"></span>${c.label}
         </div>
       `).join("");
     }
@@ -1379,7 +1387,7 @@
 
         const dot = document.createElement("span");
         dot.className = "dot";
-        dot.style.background = c.color;
+        dot.style.background = resolveCssColor(c.color);
 
         pill.appendChild(dot);
         pill.appendChild(document.createTextNode(c.label));
@@ -1517,7 +1525,6 @@
             const vh = (v / maxV) * plotH;
             const y = padT + (plotH - accH - vh);
 
-            /* ✅ stack color matches category */
             ctx.fillStyle = resolveCssColor(c.color);
             ctx.fillRect(x, y, barW, vh);
 
@@ -1533,7 +1540,7 @@
     function renderYearLegend(){
       yearLegend.innerHTML = CATS.map(c => `
         <div class="leg">
-          <span class="dot" style="background:${c.color}"></span>${c.label}
+          <span class="dot" style="background:${resolveCssColor(c.color)}"></span>${c.label}
         </div>
       `).join("");
     }
@@ -1735,28 +1742,19 @@
     saveBtn.onclick = saveFromModal;
     deleteBtn.onclick = deleteFromModal;
 
-    .btn-active{
-  border-color: rgba(124,58,237,0.55) !important;
-  color: var(--accent) !important;
-  background: rgba(124,58,237,0.06) !important;
-}
-
-
+    // toggle annual (text fixed)
     toggleYearBtn.textContent = "연간 요약 보기";
-
-toggleYearBtn.onclick = () => {
-  const isOpen = annualSection.style.display !== "none";
-
-  if (isOpen){
-    annualSection.style.display = "none";
-    toggleYearBtn.classList.remove("btn-active");
-  }else{
-    annualSection.style.display = "block";
-    toggleYearBtn.classList.add("btn-active");
-    renderAnnual();
-  }
-};
-
+    toggleYearBtn.onclick = () => {
+      const isOpen = annualSection.style.display !== "none";
+      if (isOpen){
+        annualSection.style.display = "none";
+        toggleYearBtn.classList.remove("btn-active");
+      }else{
+        annualSection.style.display = "block";
+        toggleYearBtn.classList.add("btn-active");
+        renderAnnual();
+      }
+    };
 
     exportBtn.onclick = exportJSON;
     importBtn.onclick = () => importFile.click();
