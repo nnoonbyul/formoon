@@ -460,13 +460,16 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      padding:6px 10px;
+      padding:5px 8px;
       border:1px solid var(--line);
       border-radius:999px;
       background:#fff;
       cursor:default;
+      font-size:11px;           /* 줄임 */
+      white-space:nowrap;
     }
-    .legend .leg .dot{ width:10px; height:10px; }
+    .legend .leg .dot{ width:9px; height:9px; }
+    .legend{ gap:8px; }
 
     /* Annual */
     .annual{
@@ -794,6 +797,18 @@
 
     const catLabel = Object.fromEntries(CATS.map(c => [c.key, c.label]));
     const catColor = Object.fromEntries(CATS.map(c => [c.key, c.color]));
+
+    function resolveCssColor(value){
+  // "var(--sub)" 같은 문자열을 실제 색(#ef4444)으로 바꿔줌
+  if (!value) return "rgba(107,114,128,0.6)";
+  const s = String(value).trim();
+  if (!s.startsWith("var(")) return s;
+
+  const name = s.slice(4, -1).trim(); // --sub
+  const real = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return real || "rgba(107,114,128,0.6)";
+}
+
 
     /* =========================
        Storage
@@ -1296,7 +1311,7 @@
         const y = padT + (plotH - vh);
 
         /* ✅ use category color */
-        ctx.fillStyle = c.color;
+        ctx.fillStyle = resolveCssColor(c.color);
         ctx.fillRect(x, y, barW, vh);
 
         ctx.fillStyle = "rgba(107,114,128,0.85)";
@@ -1503,7 +1518,7 @@
             const y = padT + (plotH - accH - vh);
 
             /* ✅ stack color matches category */
-            ctx.fillStyle = c.color;
+            ctx.fillStyle = resolveCssColor(c.color);
             ctx.fillRect(x, y, barW, vh);
 
             accH += vh;
@@ -1720,17 +1735,28 @@
     saveBtn.onclick = saveFromModal;
     deleteBtn.onclick = deleteFromModal;
 
-    toggleYearBtn.onclick = () => {
-      const on = annualSection.style.display !== "none";
-      if (on){
-        annualSection.style.display = "none";
-        toggleYearBtn.textContent = "연간 요약 보기";
-      }else{
-        annualSection.style.display = "block";
-        toggleYearBtn.textContent = "연간 요약 닫기";
-        renderAnnual();
-      }
-    };
+    .btn-active{
+  border-color: rgba(124,58,237,0.55) !important;
+  color: var(--accent) !important;
+  background: rgba(124,58,237,0.06) !important;
+}
+
+
+    toggleYearBtn.textContent = "연간 요약 보기";
+
+toggleYearBtn.onclick = () => {
+  const isOpen = annualSection.style.display !== "none";
+
+  if (isOpen){
+    annualSection.style.display = "none";
+    toggleYearBtn.classList.remove("btn-active");
+  }else{
+    annualSection.style.display = "block";
+    toggleYearBtn.classList.add("btn-active");
+    renderAnnual();
+  }
+};
+
 
     exportBtn.onclick = exportJSON;
     importBtn.onclick = () => importFile.click();
