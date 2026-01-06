@@ -45,10 +45,7 @@
       margin-bottom:12px;
     }
 
-    h1{
-      margin:0;
-      font-size:22px;
-    }
+    h1{ margin:0; font-size:22px; }
     .subline{
       margin-top:4px;
       font-size:13px;
@@ -189,7 +186,6 @@
     #prevMonth{ justify-self:start; }
     #nextMonth{ justify-self:end; }
 
-    /* ✅ month button border to gray */
     #monthBtn{
       justify-self:center;
       text-align:center;
@@ -200,7 +196,6 @@
       color:var(--text);
     }
 
-    /* arrows: purple icon, gray border */
     #prevMonth, #nextMonth{
       border-color:var(--line);
       color:var(--accent);
@@ -266,7 +261,7 @@
       border-radius:50%;
     }
 
-    /* Box2 */
+    /* Box body */
     .box-body{
       padding:14px;
     }
@@ -285,31 +280,52 @@
       font-weight:900;
     }
 
+    .sumchip{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:900;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      white-space:nowrap;
+    }
+
     .items{
       display:flex;
       flex-direction:column;
       gap:10px;
     }
-    .item{
-      display:grid;
-      grid-template-columns: 70px 1fr auto;
-      gap:10px;
-      padding:12px;
+
+    /* ✅ click-to-reveal actions */
+    .tx{
+      position:relative;
       border:1px solid var(--line);
       border-radius:16px;
       background:#fbfbfd;
+      padding:12px;
+      cursor:pointer;
+      overflow:hidden;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+
+    .tx-grid{
+      display:grid;
+      grid-template-columns: 70px 1fr;
+      gap:10px;
       align-items:start;
     }
-    .item-amt{
+
+    .tx-amt{
       font-weight:900;
       font-size:12px;
       color:var(--muted);
       white-space:nowrap;
     }
-    .item-main{
-      min-width:0;
-    }
-    .item-title{
+
+    .tx-main{ min-width:0; }
+    .tx-title{
       margin:0;
       font-weight:900;
       font-size:14px;
@@ -319,7 +335,8 @@
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
-    .item-meta{
+
+    .tx-meta{
       margin-top:6px;
       display:flex;
       gap:8px;
@@ -345,17 +362,38 @@
     }
     .pill .dot{ width:10px; height:10px; }
 
-    .item-actions{
+    .tx-actions{
+      position:absolute;
+      right:12px;
+      bottom:12px;
       display:flex;
-      gap:6px;
-      align-items:center;
+      gap:8px;
+      opacity:0;
+      transform:translateY(6px);
+      pointer-events:none;
+      transition:opacity .15s ease, transform .15s ease;
     }
+
+    .tx.is-open{
+      background:#f7f6fb;
+    }
+    .tx.is-open .tx-content{
+      opacity:0.45;
+      transition:opacity .15s ease;
+    }
+    .tx.is-open .tx-actions{
+      opacity:1;
+      transform:translateY(0);
+      pointer-events:auto;
+    }
+
     .iconbtn{
       padding:8px 10px;
       border-radius:12px;
       font-weight:900;
       border:1px solid var(--line);
       background:#fff;
+      cursor:pointer;
     }
     .iconbtn.edit{
       color:var(--accent);
@@ -366,69 +404,10 @@
       border-color:rgba(239,68,68,0.25);
     }
 
-    /* Box3 */
-    .tabs{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .tab{
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;
-      cursor:pointer;
-      font-size:12px;
-      font-weight:900;
-      color:var(--muted);
-      -webkit-tap-highlight-color:transparent;
-    }
-    .tab.active{
-      border-color:rgba(124,58,237,0.35);
-      color:var(--accent);
-      background:rgba(124,58,237,0.06);
-    }
-
+    /* Box3: monthly totals + chart */
     .chart-wrap{
       padding:14px;
     }
-
-    canvas{
-      width:100%;
-      height:260px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:#fff;
-    }
-
-    .legend{
-      margin-top:10px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:900;
-      user-select:none;
-    }
-    .legend .leg{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:#fff;
-      cursor:pointer;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .legend .leg.selected{
-      border-color:rgba(124,58,237,0.35);
-      background:rgba(124,58,237,0.06);
-      color:var(--text);
-    }
-    .legend .leg .dot{ width:10px; height:10px; }
 
     .cat-totals{
       display:flex;
@@ -457,18 +436,39 @@
       font-size:13px;
       white-space:nowrap;
     }
-    .sumchip{
-      font-size:12px;
-      color:var(--muted);
-      font-weight:900;
-      padding:4px 10px;
-      border-radius:999px;
+
+    canvas{
+      width:100%;
+      height:260px;
       border:1px solid var(--line);
+      border-radius:16px;
       background:#fff;
-      white-space:nowrap;
     }
 
-    /* Annual (keep) */
+    /* ✅ legend: gray border (no purple) */
+    .legend{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      user-select:none;
+    }
+    .legend .leg{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      cursor:default;
+    }
+    .legend .leg .dot{ width:10px; height:10px; }
+
+    /* Annual */
     .annual{
       margin-top:12px;
       background:var(--card);
@@ -594,8 +594,7 @@
     @media (max-width: 640px){
       header{ flex-direction:column; align-items:flex-start; }
       .cell{ min-height:78px; }
-      .item{ grid-template-columns: 64px 1fr; }
-      .item-actions{ grid-column: 1 / -1; justify-content:flex-end; }
+      .tx-grid{ grid-template-columns:64px 1fr; }
       #monthBtn{ min-width:160px; }
     }
   </style>
@@ -610,7 +609,6 @@
       </div>
     </header>
 
-    <!-- Budget board -->
     <section class="board">
       <div class="board-top">
         <p class="board-title" id="boardMonthTitle">2026년 1월 예산</p>
@@ -645,9 +643,8 @@
       </div>
     </section>
 
-    <!-- 3 boxes -->
     <section class="layout">
-      <!-- Box 1: Calendar -->
+      <!-- Box 1 -->
       <section class="box">
         <div class="box-head">
           <div class="monthbar">
@@ -663,10 +660,10 @@
         <div class="cal" id="calendar"></div>
       </section>
 
-      <!-- Box 2: Selected day CRUD ONLY -->
+      <!-- Box 2 -->
       <section class="box">
         <div class="box-head">
-          <p class="box-title">선택 날짜 소비</p>
+          <p class="box-title">오늘의 소비</p>
           <span class="sumchip" id="daySumChip">합계 0원</span>
         </div>
 
@@ -680,30 +677,23 @@
         </div>
       </section>
 
-      <!-- Box 3: Monthly category totals + chart + multi-filter -->
+      <!-- Box 3 -->
       <section class="box">
         <div class="box-head">
-          <p class="box-title">이번달 항목별</p>
-          <div class="tabs">
-            <div class="tab active" data-tab="monthbar">이번달 막대</div>
-          </div>
+          <p class="box-title">이달의 소비</p>
+          <span class="sumchip" id="monthSumChip">합계 0원</span>
         </div>
 
         <div class="chart-wrap">
           <div class="cat-totals" id="monthCatTotals"></div>
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-            <span class="sumchip" id="monthSumChip">합계 0원</span>
-            <span class="sumchip" style="border-style:dashed;">범례를 눌러 필터(복수선택)</span>
-          </div>
-          <div style="height:10px;"></div>
-
           <canvas id="chart"></canvas>
+
           <div class="legend" id="legend"></div>
         </div>
       </section>
     </section>
 
-    <!-- Annual summary -->
+    <!-- Annual -->
     <section class="annual" id="annualSection" style="display:none;">
       <div class="box-head">
         <p class="box-title">연말 정산(2026)</p>
@@ -718,12 +708,12 @@
           </div>
 
           <div>
-            <p class="board-title" style="margin:0 0 8px;">월별 총 지출(꺾은선)</p>
+            <p class="board-title" style="margin:0 0 8px;">월별 총 지출</p>
             <canvas id="yearTotalLine"></canvas>
           </div>
 
           <div>
-            <p class="board-title" style="margin:0 0 8px;">월별 항목 구성(스택 막대)</p>
+            <p class="board-title" style="margin:0 0 8px;">월별 항목 구성</p>
             <canvas id="yearStackBar"></canvas>
             <div class="legend" id="yearLegend"></div>
           </div>
@@ -731,7 +721,6 @@
       </div>
     </section>
 
-    <!-- Bottom actions (moved) -->
     <div class="bottom-actions">
       <button id="exportBtn" type="button">내보내기</button>
       <label for="importFile" style="display:inline-flex; align-items:center; gap:8px;">
@@ -809,7 +798,7 @@
     /* =========================
        Storage
     ========================= */
-    const KEY = "moonbyul_spending_v2";
+    const KEY = "moonbyul_spending_v3";
 
     function loadTx(){
       try{
@@ -938,7 +927,6 @@
     const monthCatTotalsEl = document.getElementById("monthCatTotals");
     const monthSumChip = document.getElementById("monthSumChip");
 
-    const tabs = Array.from(document.querySelectorAll(".tab"));
     const chartCanvas = document.getElementById("chart");
     const legendEl = document.getElementById("legend");
 
@@ -968,12 +956,10 @@
     const fNote = document.getElementById("fNote");
 
     let editingId = null;
-
-    // ✅ legend multi-select filter set
-    let selectedCats = new Set(); // empty => show all
+    let openCardId = null;
 
     /* =========================
-       Calendar render
+       Calendar
     ========================= */
     function weeksInMonth(year, month){
       const first = new Date(year, month, 1);
@@ -1020,7 +1006,6 @@
         const num = document.createElement("span");
         num.textContent = d.getDate();
 
-        // ✅ remove amount chip next to date (no extra UI)
         top.appendChild(num);
         cell.appendChild(top);
 
@@ -1045,8 +1030,13 @@
     }
 
     /* =========================
-       Box2 render (selected day only)
+       Box2 (오늘의 소비)
     ========================= */
+    function closeOpenCard(){
+      openCardId = null;
+      renderSelectedDate();
+    }
+
     function renderSelectedDate(){
       const d = parseDateKey(selectedKey);
       selectedDateTitle.textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
@@ -1068,22 +1058,30 @@
       }
 
       items.forEach(it => {
-        const row = document.createElement("div");
-        row.className = "item";
+        const card = document.createElement("div");
+        card.className = "tx" + (openCardId === it.id ? " is-open" : "");
+        card.setAttribute("role","button");
+        card.setAttribute("tabindex","0");
+
+        const content = document.createElement("div");
+        content.className = "tx-content";
+
+        const grid = document.createElement("div");
+        grid.className = "tx-grid";
 
         const amt = document.createElement("div");
-        amt.className = "item-amt";
+        amt.className = "tx-amt";
         amt.textContent = money(it.amount);
 
         const main = document.createElement("div");
-        main.className = "item-main";
+        main.className = "tx-main";
 
         const title = document.createElement("p");
-        title.className = "item-title";
+        title.className = "tx-title";
         title.textContent = it.note || "(내용 없음)";
 
         const meta = document.createElement("div");
-        meta.className = "item-meta";
+        meta.className = "tx-meta";
 
         const pill = document.createElement("span");
         pill.className = "pill";
@@ -1100,32 +1098,52 @@
         main.appendChild(title);
         main.appendChild(meta);
 
+        grid.appendChild(amt);
+        grid.appendChild(main);
+        content.appendChild(grid);
+
         const actions = document.createElement("div");
-        actions.className = "item-actions";
+        actions.className = "tx-actions";
 
         const edit = document.createElement("button");
         edit.className = "iconbtn edit";
         edit.textContent = "수정";
-        edit.onclick = () => openEdit(it.id);
+        edit.onclick = (e) => {
+          e.stopPropagation();
+          openEdit(it.id);
+        };
 
         const del = document.createElement("button");
         del.className = "iconbtn del";
         del.textContent = "삭제";
-        del.onclick = () => {
+        del.onclick = (e) => {
+          e.stopPropagation();
           if (!confirm("이 항목을 삭제할까요?")) return;
           tx = tx.filter(t => t.id !== it.id);
           saveTx(tx);
+          openCardId = null;
           rerenderAll();
         };
 
         actions.appendChild(edit);
         actions.appendChild(del);
 
-        row.appendChild(amt);
-        row.appendChild(main);
-        row.appendChild(actions);
+        card.appendChild(content);
+        card.appendChild(actions);
 
-        dayItemsEl.appendChild(row);
+        card.onclick = () => {
+          openCardId = (openCardId === it.id) ? null : it.id;
+          renderSelectedDate();
+        };
+
+        card.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            card.click();
+          }
+        };
+
+        dayItemsEl.appendChild(card);
       });
     }
 
@@ -1151,8 +1169,8 @@
       const pctClamped = clamp(pct, 0, 1);
 
       progressBar.style.width = `${pctClamped * 100}%`;
-      progressLeft.textContent = `${Math.round(pctClamped * 100)}%`;
-      progressRight.textContent = `${money(info.spent)} / ${money(info.budget)}`;
+      document.getElementById("progressLeft").textContent = `${Math.round(pctClamped * 100)}%`;
+      document.getElementById("progressRight").textContent = `${money(info.spent)} / ${money(info.budget)}`;
 
       if (pct > 1){
         progressBar.style.background = "rgba(239,68,68,0.55)";
@@ -1162,7 +1180,7 @@
     }
 
     /* =========================
-       Box3 monthly totals + chart + legend filter
+       Box3 (이달의 소비) + Bar chart
     ========================= */
     function renderMonthTotalsUI(){
       const year = view.getFullYear();
@@ -1221,52 +1239,6 @@
       ctx.clearRect(0,0,w,h);
     }
 
-    function getLegendCats(){
-      // if empty => all
-      return selectedCats.size ? Array.from(selectedCats) : CATS.map(c => c.key);
-    }
-
-    function renderLegend(){
-      const keys = CATS.map(c => c.key);
-      legendEl.innerHTML = "";
-
-      keys.forEach(k => {
-        const c = CATS.find(x => x.key === k);
-
-        const chip = document.createElement("div");
-        chip.className = "leg" + (selectedCats.size === 0 || selectedCats.has(k) ? " selected" : "");
-        chip.dataset.key = k;
-
-        const dot = document.createElement("span");
-        dot.className = "dot";
-        dot.style.background = catColor[k];
-
-        chip.appendChild(dot);
-        chip.appendChild(document.createTextNode(c.label));
-
-        chip.onclick = () => {
-          // multi-select toggle
-          if (selectedCats.size === 0){
-            // if currently showing all, start with only this one
-            selectedCats = new Set([k]);
-          }else{
-            if (selectedCats.has(k)) selectedCats.delete(k);
-            else selectedCats.add(k);
-
-            // if user deselects all -> show all (empty set)
-            if (selectedCats.size === 0){
-              selectedCats = new Set();
-            }
-          }
-
-          renderLegend();
-          renderChart();
-        };
-
-        legendEl.appendChild(chip);
-      });
-    }
-
     function drawMonthBar(){
       const ctx = setupCanvas(chartCanvas);
       clearCanvas(ctx, chartCanvas);
@@ -1274,9 +1246,7 @@
       const year = view.getFullYear();
       const month = view.getMonth();
 
-      const shown = getLegendCats(); // filtered cats
-      const cats = CATS.filter(c => shown.includes(c.key));
-
+      const cats = CATS;
       const values = cats.map(c => sumByMonthCat(year, month, c.key));
       const maxV = Math.max(1, ...values);
 
@@ -1325,6 +1295,7 @@
         const vh = (v / maxV) * plotH;
         const y = padT + (plotH - vh);
 
+        /* ✅ use category color */
         ctx.fillStyle = c.color;
         ctx.fillRect(x, y, barW, vh);
 
@@ -1340,13 +1311,16 @@
       });
     }
 
-    function renderChart(){
-      const active = tabs.find(t => t.classList.contains("active"))?.dataset?.tab || "monthbar";
-      if (active === "monthbar") drawMonthBar();
+    function renderLegend(){
+      legendEl.innerHTML = CATS.map(c => `
+        <div class="leg">
+          <span class="dot" style="background:${c.color}"></span>${c.label}
+        </div>
+      `).join("");
     }
 
     /* =========================
-       Annual summary (updated)
+       Annual summary
     ========================= */
     function monthTotalsOfYear(year){
       const out = Array(12).fill(0);
@@ -1425,7 +1399,6 @@
       const plotW = w - padL - padR;
       const plotH = h - padT - padB;
 
-      // axes
       ctx.strokeStyle = "rgba(107,114,128,0.35)";
       ctx.beginPath();
       ctx.moveTo(padL, padT);
@@ -1448,14 +1421,12 @@
         ctx.fillText((v/10000>=1 ? (v/10000).toFixed(0)+"만" : v.toLocaleString()), 6, y + 4);
       }
 
-      // x labels
       for (let m=0;m<12;m++){
         const x = padL + (plotW * (m/11));
         ctx.fillStyle = "rgba(107,114,128,0.8)";
         ctx.fillText(String(m+1), x - 3, h - 18);
       }
 
-      // line
       ctx.strokeStyle = "rgba(124,58,237,0.75)";
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -1467,7 +1438,6 @@
       }
       ctx.stroke();
 
-      // points
       ctx.fillStyle = "rgba(124,58,237,0.85)";
       for (let m=0;m<12;m++){
         const x = padL + (plotW * (m/11));
@@ -1493,7 +1463,6 @@
       const plotW = w - padL - padR;
       const plotH = h - padT - padB;
 
-      // axes
       ctx.strokeStyle = "rgba(107,114,128,0.35)";
       ctx.beginPath();
       ctx.moveTo(padL, padT);
@@ -1516,7 +1485,6 @@
         ctx.fillText((v/10000>=1 ? (v/10000).toFixed(0)+"만" : v.toLocaleString()), 6, y + 4);
       }
 
-      // stacked bars
       const n = 12;
       const gap = 6;
       const barW = (plotW - gap*(n+1)) / n;
@@ -1534,6 +1502,7 @@
             const vh = (v / maxV) * plotH;
             const y = padT + (plotH - accH - vh);
 
+            /* ✅ stack color matches category */
             ctx.fillStyle = c.color;
             ctx.fillRect(x, y, barW, vh);
 
@@ -1541,7 +1510,6 @@
           }
         }
 
-        // month label
         ctx.fillStyle = "rgba(107,114,128,0.8)";
         ctx.fillText(String(m+1), x + Math.max(0,(barW-6)/2), h - 18);
       }
@@ -1549,7 +1517,7 @@
 
     function renderYearLegend(){
       yearLegend.innerHTML = CATS.map(c => `
-        <div class="leg selected" style="cursor:default;">
+        <div class="leg">
           <span class="dot" style="background:${c.color}"></span>${c.label}
         </div>
       `).join("");
@@ -1609,10 +1577,10 @@
 
       saveTx(tx);
 
-      // move view to that date month, select that date
       const d = parseDateKey(date);
       view = new Date(d.getFullYear(), d.getMonth(), 1);
       selectedKey = date;
+      openCardId = null;
 
       close();
       rerenderAll();
@@ -1624,6 +1592,9 @@
 
       tx = tx.filter(t => t.id !== editingId);
       saveTx(tx);
+      editingId = null;
+      openCardId = null;
+
       close();
       rerenderAll();
     }
@@ -1639,7 +1610,6 @@
     function goMonth(diff){
       view = new Date(view.getFullYear(), view.getMonth() + diff, 1);
 
-      // ✅ if moved to current month, auto-select today; else select 1st
       const now = new Date();
       if (now.getFullYear() === YEAR && isCurrentMonth(view)){
         selectedKey = keyOfDate(now);
@@ -1647,6 +1617,7 @@
         selectedKey = keyOfDate(new Date(view.getFullYear(), view.getMonth(), 1));
       }
 
+      openCardId = null;
       rerenderAll();
     }
 
@@ -1659,6 +1630,7 @@
         view = new Date(now.getFullYear(), now.getMonth(), 1);
         selectedKey = keyOfDate(now);
       }
+      openCardId = null;
       rerenderAll();
     }
 
@@ -1666,7 +1638,7 @@
        Backup / Restore
     ========================= */
     function exportJSON(){
-      const data = { version: 2, exportedAt: new Date().toISOString(), tx };
+      const data = { version: 3, exportedAt: new Date().toISOString(), tx };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
       const url = URL.createObjectURL(blob);
 
@@ -1699,6 +1671,7 @@
 
           saveTx(tx);
           alert("가져오기 완료!");
+          openCardId = null;
           rerenderAll();
         }catch(e){
           alert("가져오기에 실패했어요. JSON 파일을 확인해 주세요.");
@@ -1711,6 +1684,7 @@
       if (!confirm("정말 전체 기록을 초기화할까요? (되돌릴 수 없음)")) return;
       tx = [];
       saveTx(tx);
+      openCardId = null;
       rerenderAll();
     }
 
@@ -1722,8 +1696,8 @@
       renderCalendar();
       renderSelectedDate();
       renderMonthTotalsUI();
+      drawMonthBar();
       renderLegend();
-      renderChart();
 
       if (annualSection.style.display !== "none"){
         renderAnnual();
@@ -1745,14 +1719,6 @@
 
     saveBtn.onclick = saveFromModal;
     deleteBtn.onclick = deleteFromModal;
-
-    tabs.forEach(t => {
-      t.onclick = () => {
-        tabs.forEach(x => x.classList.remove("active"));
-        t.classList.add("active");
-        renderChart();
-      };
-    });
 
     toggleYearBtn.onclick = () => {
       const on = annualSection.style.display !== "none";
@@ -1778,7 +1744,7 @@
     resetBtn.onclick = resetAll;
 
     window.addEventListener("resize", () => {
-      renderChart();
+      drawMonthBar();
       if (annualSection.style.display !== "none"){
         renderAnnual();
       }
