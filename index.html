@@ -902,13 +902,21 @@
 
     function computeBudgetFor(year, month){
       let balance = 0;
+      let lastYear = null;
+      
       const months = safeMonthIter(START_YEAR, START_MONTH, year, month);
       const table = {};
 
       for (const [y,m] of months){
+        if(lastYear !== null && y !== lastYear){
+          balance = 0;
+        }
+        lastYear = y;
+        
         const budget = BASE_BUDGET + balance;
         const spent = sumByMonth(y,m);
         balance = budget - spent;
+        
         table[ymKey(y,m)] = { budget, spent, balance, nextBudget: BASE_BUDGET + balance };
       }
       return table[ymKey(year,month)] || { budget: BASE_BUDGET, spent: 0, balance: BASE_BUDGET, nextBudget: BASE_BUDGET + BASE_BUDGET };
