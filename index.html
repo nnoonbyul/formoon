@@ -708,7 +708,7 @@
     <!-- Annual -->
     <section class="annual" id="annualSection" style="display:none;">
       <div class="box-head">
-        <p class="box-title">연말 정산(2026)</p>
+        <p class="box-title" id="annualTitle">연말 정산</p>
         <span class="sumchip" id="yearSumChip">연간 합계 0원</span>
       </div>
 
@@ -794,8 +794,7 @@
     const BASE_BUDGET = 250000;
     const START_YEAR = 2026;
     const START_MONTH = 0; // Jan
-    const YEAR = 2026;
-
+    
     const CATS = [
       { key:"concert", label:"공연",  color:"var(--concert)" },
       { key:"traffic", label:"교통",  color:"var(--traffic)" },
@@ -930,7 +929,7 @@
 
     (function initSelected(){
       const now = new Date();
-      if (now.getFullYear() === YEAR){
+      if (now.getFullYear() === START_YEAR){
         view = new Date(now.getFullYear(), now.getMonth(), 1);
         selectedKey = keyOfDate(now);
       }
@@ -964,6 +963,7 @@
 
     const annualSection = document.getElementById("annualSection");
     const toggleYearBtn = document.getElementById("toggleYearBtn");
+    const annualTitle = document.getElementById("annualTitle");
     const yearSumChip = document.getElementById("yearSumChip");
     const yearCatTotals = document.getElementById("yearCatTotals");
     const yearTotalLine = document.getElementById("yearTotalLine");
@@ -1373,15 +1373,21 @@
     }
 
     function renderAnnual(){
+      const year = view.getFullYear();
+
+      if (annualTitle){
+        annualTitle.textContent = `연말 정산(${year})`;
+      }
+
       const yearTotal = tx
-        .filter(t => String(t.date||"").startsWith(String(YEAR)))
+        .filter(t => String(t.date||"").startsWith(String(year)))
         .reduce((s,t)=>s+(Number(t.amount)||0),0);
       yearSumChip.textContent = `연간 합계 ${money(yearTotal)}`;
 
       yearCatTotals.innerHTML = "";
       for (const c of CATS){
         const sum = tx
-          .filter(t => String(t.date||"").startsWith(String(YEAR)) && t.category===c.key)
+          .filter(t => String(t.date||"").startsWith(String(year)) && t.category===c.key)
           .reduce((s,t)=>s+(Number(t.amount)||0),0);
 
         const row = document.createElement("div");
@@ -1411,16 +1417,16 @@
         yearCatTotals.appendChild(row);
       }
 
-      drawYearTotalLine();
-      drawYearStackBar();
+      drawYearTotalLine(year);
+      drawYearStackBar(year);
       renderYearLegend();
     }
 
-    function drawYearTotalLine(){
+    function drawYearTotalLine(year){
       const ctx = setupCanvas(yearTotalLine);
       clearCanvas(ctx, yearTotalLine);
 
-      const values = monthTotalsOfYear(YEAR);
+      const values = monthTotalsOfYear(year);
       const maxV = Math.max(1, ...values);
 
       const w = yearTotalLine.getBoundingClientRect().width;
@@ -1479,12 +1485,12 @@
       }
     }
 
-    function drawYearStackBar(){
+    function drawYearStackBar(year){
       const ctx = setupCanvas(yearStackBar);
       clearCanvas(ctx, yearStackBar);
 
-      const catData = monthCatTotalsOfYear(YEAR);
-      const monthTotals = monthTotalsOfYear(YEAR);
+      const catData = monthCatTotalsOfYear(year);
+      const monthTotals = monthTotalsOfYear(year);
       const maxV = Math.max(1, ...monthTotals);
 
       const w = yearStackBar.getBoundingClientRect().width;
@@ -1641,7 +1647,7 @@
       view = new Date(view.getFullYear(), view.getMonth() + diff, 1);
 
       const now = new Date();
-      if (now.getFullYear() === YEAR && isCurrentMonth(view)){
+      if (isCurrentMonth(view)){
         selectedKey = keyOfDate(now);
       }else{
         selectedKey = keyOfDate(new Date(view.getFullYear(), view.getMonth(), 1));
@@ -1653,13 +1659,8 @@
 
     function goCurrentMonth(){
       const now = new Date();
-      if (now.getFullYear() !== YEAR){
-        view = new Date(START_YEAR, START_MONTH, 1);
-        selectedKey = keyOfDate(new Date(START_YEAR, START_MONTH, 1));
-      }else{
-        view = new Date(now.getFullYear(), now.getMonth(), 1);
-        selectedKey = keyOfDate(now);
-      }
+      view = new Date(now.getFullYear(), now.getMonth(), 1);
+      selectedKey = keyOfDate(now);
       openCardId = null;
       rerenderAll();
     }
@@ -1668,13 +1669,14 @@
        Backup / Restore
     ========================= */
     function exportJSON(){
+      const year = view.getFullYear();
       const data = { version: 3, exportedAt: new Date().toISOString(), tx };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `moonbyul_spending_${YEAR}_${Date.now()}.json`;
+      a.download = `moonbyul_spending_${year}_${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
